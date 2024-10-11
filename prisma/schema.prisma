@@ -8,18 +8,18 @@ datasource db {
 }
 
 model User {
-  id             String   @id @default(cuid())  // Unique ID for each user
-  email          String?  @unique               // Email is optional but unique
-  password       String?                        // Password for credential-based login
-  name           String?                        // User's name
-  image          String?                        // User's profile picture
-  googleId       String?  @unique               // Unique Google ID for OAuth users
-  method         String                         // Login method (EMAIL, PASSWORD, GOOGLE, etc.)
-  createdAt      DateTime @default(now())        // When the user was created
-  updatedAt      DateTime @updatedAt             // Automatically updates when user data is updated
+  id             String   @id @default(cuid()) // Unique ID for each user
+  email          String?  @unique              // Email is optional but unique
+  password       String?                       // Password for credential-based login
+  name           String?                       // User's name
+  image          String?                       // User's profile picture
+  googleId       String?  @unique              // Unique Google ID for OAuth users
+  method         String                        // Login method (EMAIL, PASSWORD, GOOGLE, etc.)
+  createdAt      DateTime @default(now())       // When the user was created
+  updatedAt      DateTime @updatedAt            // Automatically updates when user data is updated
 
-  profile        Profile?                       // One-to-one relationship with Profile
-  accounts       Account[]                      // One-to-many relationship with Account (Links)
+  profile        Profile?                      // One-to-one relationship with Profile
+  accounts       Account[]                     // One-to-many relationship with Account (Links)
 }
 
 model Profile {
@@ -28,8 +28,10 @@ model Profile {
   headline       String?                        // Profile headline or short description
   backgroundImg  String?                        // Background image for the profile
   image          String?                        // Profile image (avatar)
+  name           String?                        // Profile display name
+  username       String   @unique               // Username for profile, must be unique
   userId         String   @unique               // Unique user ID associated with this profile
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Relationship to User
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to User
   accounts       Account[]                      // One-to-many relationship with Account (Links)
 }
 
@@ -38,8 +40,7 @@ model Account {
   platform       String                         // Name of the platform (e.g., Twitter, GitHub)
   url            String   @unique               // Unique URL for each link
   profileId      String                         // Foreign key from Profile
-  profile        Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade) // Relationship to Profile
-  // Add relation back to User
-  userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile        Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade) // Relation to Profile
+  userId         String                         // Foreign key from User (optional, in case you want a back link to the user)
+  user           User?     @relation(fields: [userId], references: [id], onDelete: Cascade) // Optional relation back to User
 }

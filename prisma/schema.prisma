@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id @default(cuid())  // Unique ID for each user
+  email          String?  @unique               // Email is optional but unique
+  password       String?                        // Password for credential-based login
+  name           String?                        // User's name
+  image          String?                        // User's profile picture
+  googleId       String?  @unique               // Unique Google ID for OAuth users
+  method         String                         // Login method (EMAIL, PASSWORD, GOOGLE, etc.)
+  createdAt      DateTime @default(now())        // When the user was created
+  updatedAt      DateTime @updatedAt             // Automatically updates when user data is updated
+
+  profile        Profile?                       // One-to-one relationship with Profile
+  accounts       Account[]                      // One-to-many relationship with Account (Links)
+}
+
+model Profile {
+  id             String   @id @default(cuid())  // Unique ID for each profile
+  bio            String?                        // User's bio
+  headline       String?                        // Profile headline or short description
+  backgroundImg  String?                        // Background image for the profile
+  image          String?                        // Profile image (avatar)
+  userId         String   @unique               // Unique user ID associated with this profile
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Relationship to User
+  accounts       Account[]                      // One-to-many relationship with Account (Links)
+}
+
+model Account {
+  id             String   @id @default(cuid())  // Unique ID for each account (link)
+  platform       String                         // Name of the platform (e.g., Twitter, GitHub)
+  url            String   @unique               // Unique URL for each link
+  profileId      String                         // Foreign key from Profile
+  profile        Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade) // Relationship to Profile
+  // Add relation back to User
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

@@ -1,54 +1,104 @@
-// components/PreviewCard.tsx
 "use client";
-import axios from "axios";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Github, Instagram, Linkedin, Twitter, Globe, MoreHorizontal } from 'lucide-react';
+
+interface Account {
+  platform: string;
+  url: string;
+}
+
+interface Profile {
+  image: string;
+  name: string;
+  headline: string;
+  accounts: Account[];
+}
+
 const PreviewCard = () => {
-  const session = useSession();
-  const [name, setName] = useState('');
-  const [title, setTitle] = useState('');
-  const [profilePicture, setProfilePicture] = useState('');
-  
-  useEffect(()=> {
-    const fetchData = async ()=> {
+  const [profileData, setProfileData] = useState<Profile | null>(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get('/api/add-url');
-        console.log("Here is backend response for Preview: ",response)
-        setName(response.data.profile.name)
-        setTitle(response.data.profile.headline)
-        setProfilePicture(response.data.profile.image)
-      } catch (error) {
-        throw new Error("Error While Fetching Data")
+        const response = await axios.get('/api/add-url'); // Ensure this matches your backend endpoint
+        const profile = response.data.profile;
+        console.log("Here is the preview data :",profile)
+        if (profile) {
+          setProfileData(profile);
+        } else {
+          setError("No profile found.");
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Error while fetching data.");
       }
-    }
+    };
+
     fetchData();
-  },[])
+  }, []);
+
+  const getIconForPlatform = (platform: string) => {
+    switch (platform.toLowerCase()) {
+      case 'github':
+        return <Github size={20} />;
+      case 'instagram':
+        return <Instagram size={20} />;
+      case 'linkedin':
+        return <Linkedin size={20} />;
+      case 'twitter':
+        return <Twitter size={20} />;
+      default:
+        return <Globe size={20} />;
+    }
+  };
 
   return (
-      <div className="relative bg-white p-4 rounded-[30px] shadow-lg w-[300px] h-[600px] border-8 border-gray-300">
-        {/* iPhone notch simulation */}
-        <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-20 h-1.5 bg-gray-400 rounded-full"></div>
-        
-        <h2 className="text-lg font-bold text-center mt-4 mb-4">Preview</h2>
-        
-        <div className="flex flex-col items-center mb-4">
-          <img
-            src={profilePicture|| profilePicture || '/placeholder.png'}
-            alt="Profile"
-            className="w-20 h-20 rounded-full mb-4"
-          />
+    <div className="rounded-2xl min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400">
+      <div className="w-full max-w-md space-y-6 backdrop-blur-lg bg-white/10 p-8 rounded-3xl shadow-2xl">
+        <div className="text-center">
+          <Avatar className="w-32 h-32 mx-auto border-4 border-white shadow-lg">
+            <AvatarImage src={profileData?.image || '/placeholder.svg'} alt={profileData?.name} />
+            <AvatarFallback>{profileData?.name?.charAt(0) || 'U'}</AvatarFallback>
+          </Avatar>
+          <h1 className="mt-6 text-3xl font-bold text-white">{profileData?.name || 'User Name'}</h1>
+          <p className="mt-2 text-xl text-white/80">{profileData?.headline || 'Aspiring Software Engineer'}</p>
         </div>
-        
-        <div className="flex flex-col items-center text-center">
-          <p className="font-bold text-md">{name || 'User Name'}</p>
-          <p className="text-gray-500 text-sm">{title || 'Title'}</p>
+        <div className="space-y-4">
+          {profileData?.accounts?.map((account, index) => (
+            <Button
+              key={index}
+              variant="secondary"
+              className="w-full justify-between text-left font-medium bg-white/20 hover:bg-white/30 text-white border border-white/30 transition-all duration-300 ease-in-out transform hover:scale-105"
+              asChild
+            >
+              <a href={account.url} target="_blank" rel="noopener noreferrer">
+                <span className="flex items-center gap-3">
+                  {getIconForPlatform(account.platform)}
+                  {account.platform}
+                </span>
+                <MoreHorizontal size={20} />
+              </a>
+            </Button>
+          ))}
         </div>
-
-        <div className="border-t border-gray-300 pt-4 mt-6 w-full text-center">
-          <p>Links Area</p>
-          {/* Render links here */}
+        {error && (
+          <div className="mt-4 text-red-300 text-center bg-red-500/20 p-3 rounded-lg">{error}</div>
+        )}
+        <div className="text-center pt-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            linkhive/{profileData?.name?.toLowerCase() || 'username'}
+          </Button>
         </div>
       </div>
+    </div>
   );
 };
 

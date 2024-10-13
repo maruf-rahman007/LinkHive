@@ -12,7 +12,7 @@ const MenuBar = () => {
 
   return (
     <div className="flex flex-col md:flex-col bg-gray-200 p-2 md:p-4 rounded-[30px] h-auto md:h-[600px] w-full md:w-[100px] justify-between items-center shadow-lg">
-      <button onClick={() => onClickHandler('./user/links')} className="p-2 bg-blue-500 text-white rounded-full w-full hover:bg-blue-600 mb-1 md:mb-2">
+      <button onClick={() => onClickHandler('/user/links')} className="p-2 bg-blue-500 text-white rounded-full w-full hover:bg-blue-600 mb-1 md:mb-2">
         Links
       </button>
       <button onClick={() => onClickHandler('/user/appear')} className="p-2 bg-blue-500 text-white rounded-full w-full hover:bg-blue-600 mb-1 md:mb-2">

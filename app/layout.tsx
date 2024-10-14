@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Provider } from "./provider";
 import { Toaster } from "@/components/ui/toaster";
+import RecoilContextProvider from "./lib/RecoilContextProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -37,7 +38,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Provider>
+          <RecoilContextProvider>
           {children}
+          </RecoilContextProvider>
           <Toaster />
         </Provider>
       </body>

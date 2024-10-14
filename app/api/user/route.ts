@@ -13,67 +13,73 @@ export async function GET(req: Request) {
 }
 
 // Handling POST requests
+// Handling POST requests
 export async function POST(req: Request) {
-    const session = await getServerSession(NEXT_AUTH);
+  const session = await getServerSession(NEXT_AUTH);
 
-    console.log(session)
-    if (!session || !session.user) {
+  if (!session || !session.user) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-    const user = await prisma.user.findUnique({
-        where:{
-            email:session.user.email
-        }
-    })
+  }
 
-    if(!user) {
-        return NextResponse.json({ message: 'User Does not exist' }, { status: 404 });
-    }
+  const user = await prisma.user.findUnique({
+      where: {
+          email: session.user.email
+      }
+  });
 
-    try {
+  if (!user) {
+      return NextResponse.json({ message: 'User does not exist' }, { status: 404 });
+  }
+
+  try {
       const data = await req.json(); // Parse the incoming JSON data
       const { username, title, profilePicture } = data;
-  
-      // Log received data for debugging
-      console.log('Received data:', { username, title, profilePicture });
-  
-      // Check if a profile with the same userId (username) already exists
+
+      // Check if a profile with the same userId already exists
       const existingProfile = await prisma.profile.findUnique({
-        where: {
-          username: username,
-        },
+          where: {
+              userId: user.id,
+          },
       });
-  
+
       if (existingProfile) {
-        // Return error if username already exists
-        return NextResponse.json(
-          { message: "Username already exists, please choose another name" },
-          { status: 400 }
-        );
+          // Update the existing profile
+          const updatedProfile = await prisma.profile.update({
+              where: { id: existingProfile.id }, // Assuming 'id' is the unique identifier for the profile
+              data: {
+                  headline: title,
+                  image: profilePicture,
+                  username: username, // Optional: You can choose to update the username or keep it unchanged
+                  name: session.user.name,
+              },
+          });
+
+          return NextResponse.json({
+              message: 'Profile updated successfully',
+              updatedProfile,
+          });
+      } else {
+          // Create a new profile if it doesn't exist
+          const newProfile = await prisma.profile.create({
+              data: {
+                  userId: user.id,
+                  headline: title,
+                  image: profilePicture,
+                  username: username,
+                  name: session.user.name,
+              },
+          });
+
+          return NextResponse.json({
+              message: 'Profile created successfully',
+              newProfile,
+          });
       }
-  
-      // Create a new profile if the username is unique
-      const newProfile = await prisma.profile.create({
-        data: {
-          userId: user.id,
-          headline: title,
-          image: profilePicture,
-          username:username,
-          name:session.user.name,
-        },
-      });
-  
-      return NextResponse.json({
-        message: 'Profile updated successfully',
-        newProfile,
-      });
-    } catch (error) {
-      // Log and return a more detailed error response
-      //@ts-ignore
-      console.error('Error processing request:', error.message);
+  } catch (error) {
+      console.error('Error processing request:', error);
       return NextResponse.json(
-        { message: 'Something went wrong, please try again', error: error },
-        { status: 500 }
+          { message: 'Something went wrong, please try again', error: error },
+          { status: 500 }
       );
-    }
   }
+}

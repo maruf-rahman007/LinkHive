@@ -14,7 +14,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import axios from "axios";
-import { Plus, Edit2, Share2, Star, Lock, BarChart2, Trash2 } from 'lucide-react'
+import { Plus, Edit2, Share2, Star, Lock, BarChart2, Trash2 } from 'lucide-react';
+import { useRecoilState } from 'recoil';
+import { profileAccountsAtom } from "@/store/atoms/atoms"; // Adjust the path according to your project structure
 
 export const platforms = [
     { key: "instagram", label: "Instagram" },
@@ -28,6 +30,7 @@ export default function LinkCards() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [url, setUrl] = useState('');
     const [platform, setPlatform] = useState('');
+    const [profileAccounts, setProfileAccounts] = useRecoilState(profileAccountsAtom); // Access Recoil state
 
     const handleAction = async () => {
         console.log('URL:', url);
@@ -36,6 +39,11 @@ export default function LinkCards() {
             url,
             platform
         });
+
+        // Update the profile accounts after adding a new account
+        if (response.status === 200) {
+            setProfileAccounts([...profileAccounts, { platform, url }]);
+        }
     };
 
     return (
@@ -105,10 +113,10 @@ export default function LinkCards() {
                 </ModalContent>
             </Modal>
             
-            {['Maruf Rahman', '_hudaii_', 'Maruf Rahman'].map((name, index) => (
+            {profileAccounts.map((account, index) => (
                 <div key={index} className="bg-white rounded-2xl shadow-md p-6 mb-4 transition-all duration-300 ease-in-out hover:shadow-lg border border-indigo-200">
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="font-bold text-lg text-indigo-800">{name}</h3>
+                        <h3 className="font-bold text-lg text-indigo-800">{account.platform}</h3>
                         <div className="flex space-x-2">
                             <button className="p-2 hover:bg-indigo-100 rounded-full text-indigo-600 transition-colors duration-200">
                                 <Edit2 size={18} />
@@ -121,7 +129,7 @@ export default function LinkCards() {
                             </button>
                         </div>
                     </div>
-                    <p className="text-indigo-600 mb-4">https://example.com/profile</p>
+                    <p className="text-indigo-600 mb-4">{account.url}</p>
                     <div className="flex justify-between items-center text-sm text-indigo-500">
                         <div className="flex space-x-4">
                             <span className="flex items-center"><Star size={16} className="mr-1" /> 0</span>

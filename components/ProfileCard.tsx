@@ -1,37 +1,27 @@
 "use client"
 import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
 import axios from 'axios';
+import Image from 'next/image'; // Import Next.js Image component
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { profileHeadlineAtom, profileImageAtom, profileNameAtom, usernameAtom } from '@/store/atoms/atoms';
 
 const ProfileCard = () => {
   const session = useSession();
-  const [username, setUsername] = useState('');
-  const [title, setTitle] = useState('');
-  const [profilePicture, setProfilePicture] = useState(''); // Placeholder for profile picture
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('/api/user');
-        const { username, title, image } = response.data.session.user;
-        setUsername(username || '');
-        setTitle(title || '');
-        setProfilePicture(image || '/placeholder.png');
-      } catch (error) {
-        throw new Error("Error While Fetching Data");
-      }
-    };
-    fetchData();
-  }, []);
+  const [profileImage, setProfileImage] = useRecoilState(profileImageAtom);
+  const [profileHeadline, setProfileHeadline] = useRecoilState(profileHeadlineAtom);
+  const [usernameatom,setUsernameAtome] = useRecoilState(usernameAtom);
 
   const handleSave = async () => {
     try {
       const response = await axios.post('/api/user', {
-        username,
-        title,
-        profilePicture,
+        username:usernameatom,
+        title:profileHeadline,
+        profilePicture:profileImage,
       });
-
+      setProfileImage(response.data.updatedProfile.image);
+      setProfileHeadline(response.data.updatedProfile.headline);
+      setUsernameAtome(response.data.updatedProfile.username)
+      console.log("response after post",response);
       if (response.status === 200) {
         alert('Profile updated successfully!');
       }
@@ -47,10 +37,12 @@ const ProfileCard = () => {
         <h2 className="text-xl font-bold mb-4">Set Profile Information</h2>
       </div>
       <div className="flex items-center mb-8 mt-8">
-        <img
-          src={profilePicture || '/placeholder.png'} // Placeholder image
+        <Image
+          src={profileImage || '/placeholder.png'} // Placeholder image
           alt="Profile"
-          className="w-17 h-17 rounded-full mr-4"
+          width={68} // Size adjustments for Next.js Image
+          height={68}
+          className="rounded-full mr-4"
         />
         <button className="p-2 m-4 bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors duration-300">
           Change
@@ -58,17 +50,17 @@ const ProfileCard = () => {
       </div>
       <input
         type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Username"
-        className="border p-2 rounded mb-4 w-full bg-white bg-opacity-80 focus:bg-white" // Semi-transparent white background
+        value={usernameatom}
+        onChange={(e) => setUsernameAtome(e.target.value)}
+        placeholder={usernameatom}
+        className="border p-2 rounded mb-4 w-full bg-white bg-opacity-80 focus:bg-white"
       />
       <input
         type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Title"
-        className="border p-2 rounded mb-4 w-full bg-white bg-opacity-80 focus:bg-white" // Semi-transparent white background
+        value={profileHeadline}
+        onChange={(e) => setProfileHeadline(e.target.value)}
+        placeholder={profileHeadline}
+        className="border p-2 rounded mb-4 w-full bg-white bg-opacity-80 focus:bg-white"
       />
       <button
         onClick={handleSave}

@@ -2,6 +2,7 @@ import { atom } from "recoil";
 
 
 interface Account {
+  id:string,
   platform: string;
   url: string;
 }

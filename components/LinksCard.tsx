@@ -16,7 +16,10 @@ import { useState } from "react";
 import axios from "axios";
 import { Plus, Edit2, Share2, Star, Lock, BarChart2, Trash2 } from 'lucide-react';
 import { useRecoilState } from 'recoil';
-import { profileAccountsAtom } from "@/store/atoms/atoms"; // Adjust the path according to your project structure
+import { profileAccountsAtom } from "@/store/atoms/atoms"; 
+import { useRouter } from 'next/router';
+
+
 
 export const platforms = [
     { key: "instagram", label: "Instagram" },
@@ -30,7 +33,7 @@ export default function LinkCards() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [url, setUrl] = useState('');
     const [platform, setPlatform] = useState('');
-    const [profileAccounts, setProfileAccounts] = useRecoilState(profileAccountsAtom); // Access Recoil state
+    const [profileAccounts, setProfileAccounts] = useRecoilState(profileAccountsAtom);
 
     const handleAction = async () => {
         console.log('URL:', url);
@@ -42,9 +45,25 @@ export default function LinkCards() {
 
         // Update the profile accounts after adding a new account
         if (response.status === 200) {
-            setProfileAccounts([...profileAccounts, { platform, url }]);
+            console.log("new url add respobnse",response);
+            const id = response.data.newUrlData.id;
+            console.log(id,platform,url);
+            setProfileAccounts([...profileAccounts, { id, platform, url }]);
         }
     };
+    //@ts-ignore
+    const handleDelete = async (profileAccount,id)=> {
+        console.log("Hi there its delete button",profileAccounts[id])
+        const resp = await axios.post('/api/delete-account',{
+            profileAccounts:profileAccount,
+            index:id
+        });
+        if (resp.status === 200) {
+            console.log("Here is my response ",resp);
+            const updatedAccounts = profileAccounts.filter((_, index) => index !== id);
+            setProfileAccounts(updatedAccounts);
+        }
+    }
 
     return (
         <div className="relative transition duration-75 ease-out w-full h-2xl px-md rounded-xl outline-none bg-gradient-to-br from-indigo-100 to-purple-100 p-6">
@@ -124,7 +143,7 @@ export default function LinkCards() {
                             <button className="p-2 hover:bg-indigo-100 rounded-full text-indigo-600 transition-colors duration-200">
                                 <Share2 size={18} />
                             </button>
-                            <button className="p-2 hover:bg-indigo-100 rounded-full text-indigo-600 transition-colors duration-200">
+                            <button onClick={()=>handleDelete(profileAccounts,index) } className="p-2 hover:bg-indigo-100 rounded-full text-indigo-600 transition-colors duration-200">
                                 <Trash2 size={18} />
                             </button>
                         </div>

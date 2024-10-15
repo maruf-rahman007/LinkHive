@@ -2,7 +2,7 @@ import { atom } from "recoil";
 
 
 interface Account {
-  id:string,
+  id: string,
   platform: string;
   url: string;
 }
@@ -11,7 +11,7 @@ interface Account {
 
 export const profileInfo = atom({
   key: 'profileInfo',
-  default: {}, 
+  default: {},
 });
 
 

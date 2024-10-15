@@ -17,7 +17,7 @@ const PreviewCard = () => {
   const profileName = useRecoilValue(profileNameAtom);
   const profileHeadline = useRecoilValue(profileHeadlineAtom);
   const profileAccounts = useRecoilValue(profileAccountsAtom);
-  console.log("here is headline :",profileHeadline);
+  console.log("here is headline :", profileHeadline);
   const getIconForPlatform = (platform: string) => {
     switch (platform.toLowerCase()) {
       case 'github':

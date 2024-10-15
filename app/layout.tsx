@@ -39,7 +39,7 @@ export default function RootLayout({
       >
         <Provider>
           <RecoilContextProvider>
-          {children}
+            {children}
           </RecoilContextProvider>
           <Toaster />
         </Provider>

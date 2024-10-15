@@ -9,19 +9,19 @@ const ProfileCard = () => {
   const session = useSession();
   const [profileImage, setProfileImage] = useRecoilState(profileImageAtom);
   const [profileHeadline, setProfileHeadline] = useRecoilState(profileHeadlineAtom);
-  const [usernameatom,setUsernameAtome] = useRecoilState(usernameAtom);
+  const [usernameatom, setUsernameAtome] = useRecoilState(usernameAtom);
 
   const handleSave = async () => {
     try {
       const response = await axios.post('/api/user', {
-        username:usernameatom,
-        title:profileHeadline,
-        profilePicture:profileImage,
+        username: usernameatom,
+        title: profileHeadline,
+        profilePicture: profileImage,
       });
       setProfileImage(response.data.updatedProfile.image);
       setProfileHeadline(response.data.updatedProfile.headline);
       setUsernameAtome(response.data.updatedProfile.username)
-      console.log("response after post",response);
+      console.log("response after post", response);
       if (response.status === 200) {
         alert('Profile updated successfully!');
       }
@@ -45,16 +45,16 @@ const ProfileCard = () => {
           className="rounded-full mr-4"
         />
         <UploadButton
-        endpoint="imageUploader"
-        onClientUploadComplete={(res) => {
-          // Do something with the response
-          console.log("Files: ", res);
-          setProfileImage(res[0].appUrl);
-        }}
-        onUploadError={(error: Error) => {
-          alert(`ERROR! ${error.message}`);
-        }}
-      />
+          endpoint="imageUploader"
+          onClientUploadComplete={(res) => {
+            // Do something with the response
+            console.log("Files: ", res);
+            setProfileImage(res[0].appUrl);
+          }}
+          onUploadError={(error: Error) => {
+            alert(`ERROR! ${error.message}`);
+          }}
+        />
       </div>
       <input
         type="text"

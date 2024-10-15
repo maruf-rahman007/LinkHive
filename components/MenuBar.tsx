@@ -37,8 +37,8 @@ export default function MenuBar() {
             key={index}
             onClick={() => handleNavigation(item.route)}
             className={`flex-1 p-3 rounded-xl transition-all duration-300 ease-in-out flex flex-col 
-              items-center justify-center group ${activeRoute === item.route 
-                ? 'bg-white text-purple-600 shadow-lg transform scale-105' 
+              items-center justify-center group ${activeRoute === item.route
+                ? 'bg-white text-purple-600 shadow-lg transform scale-105'
                 : 'text-white hover:bg-white/10'}`}
           >
             <item.icon className={`w-6 h-6 mb-2 transition-transform group-hover:scale-110 ${activeRoute === item.route ? 'text-purple-600' : 'text-white'}`} />
@@ -54,8 +54,8 @@ export default function MenuBar() {
             key={index}
             onClick={() => handleNavigation(item.route)}
             className={`w-full p-3 rounded-xl transition-all duration-300 ease-in-out flex flex-col 
-              items-center justify-center group ${activeRoute === item.route 
-                ? 'bg-white text-purple-600 shadow-lg transform scale-105' 
+              items-center justify-center group ${activeRoute === item.route
+                ? 'bg-white text-purple-600 shadow-lg transform scale-105'
                 : 'text-white hover:bg-white/10'}`}
           >
             <item.icon className={`w-6 h-6 mb-2 transition-transform group-hover:scale-110 ${activeRoute === item.route ? 'text-purple-600' : 'text-white'}`} />

@@ -32,7 +32,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-500 text-white">
       {/* Header */}
-      
+
 
       {/* Mobile Menu */}
       {isMenuOpen && (

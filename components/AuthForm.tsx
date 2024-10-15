@@ -27,7 +27,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignUp }) => {
         });
 
         if (res?.error) {
-            toast({ title: "Error", description: res.error, variant: "destructive" }); 
+            toast({ title: "Error", description: res.error, variant: "destructive" });
             console.log("Email sign-in error:", res.error);
         } else {
             router.push("/user");

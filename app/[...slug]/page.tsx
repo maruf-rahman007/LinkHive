@@ -96,9 +96,9 @@ export default function CatchAllPage() {
           <div className="mt-4 text-red-300 text-center bg-red-500/20 p-3 rounded-lg">{error}</div>
         )}
         <div className="text-center pt-4">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="transition-all duration-300 ease-in-out transform hover:scale-105"
           >
             linkhive/{slugPath}

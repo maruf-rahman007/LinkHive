@@ -1,7 +1,7 @@
 'use client'
 
 import {
-  profileInfo, 
+  profileInfo,
   profileImageAtom,
   profileNameAtom,
   profileHeadlineAtom,
@@ -18,7 +18,7 @@ export default function UserRoot({ children }: any) {
   const [profileName, setProfileName] = useRecoilState(profileNameAtom);
   const [profileHeadline, setProfileHeadline] = useRecoilState(profileHeadlineAtom);
   const [profileAccounts, setProfileAccounts] = useRecoilState(profileAccountsAtom);
-  const [userName,setUsername] = useRecoilState<string>(usernameAtom)
+  const [userName, setUsername] = useRecoilState<string>(usernameAtom)
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -28,7 +28,7 @@ export default function UserRoot({ children }: any) {
         const response = await axios.get('/api/add-url'); // Ensure this matches your backend endpoint
         const profile = response.data.profile;
         console.log("Here is the preview data :", profile);
-        
+
         if (profile) {
           // Set individual profile states
           setProfileImage(profile.image || '/placeholder.svg');

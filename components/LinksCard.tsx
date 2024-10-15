@@ -16,7 +16,7 @@ import { useState } from "react";
 import axios from "axios";
 import { Plus, Edit2, Share2, Star, Lock, BarChart2, Trash2 } from 'lucide-react';
 import { useRecoilState } from 'recoil';
-import { profileAccountsAtom } from "@/store/atoms/atoms"; 
+import { profileAccountsAtom } from "@/store/atoms/atoms";
 import { useRouter } from 'next/router';
 
 
@@ -45,21 +45,21 @@ export default function LinkCards() {
 
         // Update the profile accounts after adding a new account
         if (response.status === 200) {
-            console.log("new url add respobnse",response);
+            console.log("new url add respobnse", response);
             const id = response.data.newUrlData.id;
-            console.log(id,platform,url);
+            console.log(id, platform, url);
             setProfileAccounts([...profileAccounts, { id, platform, url }]);
         }
     };
     //@ts-ignore
-    const handleDelete = async (profileAccount,id)=> {
-        console.log("Hi there its delete button",profileAccounts[id])
-        const resp = await axios.post('/api/delete-account',{
-            profileAccounts:profileAccount,
-            index:id
+    const handleDelete = async (profileAccount, id) => {
+        console.log("Hi there its delete button", profileAccounts[id])
+        const resp = await axios.post('/api/delete-account', {
+            profileAccounts: profileAccount,
+            index: id
         });
         if (resp.status === 200) {
-            console.log("Here is my response ",resp);
+            console.log("Here is my response ", resp);
             const updatedAccounts = profileAccounts.filter((_, index) => index !== id);
             setProfileAccounts(updatedAccounts);
         }
@@ -75,8 +75,8 @@ export default function LinkCards() {
                 <span className="ml-2 text-indigo-600 text-lg font-semibold group-hover:text-white transition-colors duration-300">Add link</span>
             </div>
 
-            <Modal 
-                isOpen={isOpen} 
+            <Modal
+                isOpen={isOpen}
                 onOpenChange={onOpenChange}
                 classNames={{
                     base: "bg-indigo-50 rounded-lg shadow-indigo-200/50",
@@ -131,7 +131,7 @@ export default function LinkCards() {
                     )}
                 </ModalContent>
             </Modal>
-            
+
             {profileAccounts.map((account, index) => (
                 <div key={index} className="bg-white rounded-2xl shadow-md p-6 mb-4 transition-all duration-300 ease-in-out hover:shadow-lg border border-indigo-200">
                     <div className="flex justify-between items-center mb-4">
@@ -143,7 +143,7 @@ export default function LinkCards() {
                             <button className="p-2 hover:bg-indigo-100 rounded-full text-indigo-600 transition-colors duration-200">
                                 <Share2 size={18} />
                             </button>
-                            <button onClick={()=>handleDelete(profileAccounts,index) } className="p-2 hover:bg-indigo-100 rounded-full text-indigo-600 transition-colors duration-200">
+                            <button onClick={() => handleDelete(profileAccounts, index)} className="p-2 hover:bg-indigo-100 rounded-full text-indigo-600 transition-colors duration-200">
                                 <Trash2 size={18} />
                             </button>
                         </div>

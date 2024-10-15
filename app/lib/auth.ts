@@ -1,10 +1,7 @@
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
-import { signIn } from 'next-auth/react';
+import bcrypt from "bcryptjs";
 import prisma from './prisma';
-import bcrypt from "bcryptjs"
-import { error } from 'console';
 import { checkExistingUser, isEmailMethod } from '@/hooks/helper/authHelper';
 
 export const NEXT_AUTH = {
@@ -19,13 +16,13 @@ export const NEXT_AUTH = {
             async authorize(credentials: any) {
                 console.log("Received credentials:", credentials);
 
+                // Handle login flow
                 if (credentials.isLogin === 'true') {
-
-                    const user = await checkExistingUser(credentials.email)
-
+                    const user = await checkExistingUser(credentials.email);
                     if (user && isEmailMethod(user)) {
                         const isPasswordValid = await bcrypt.compare(credentials.password, user.password || "");
                         if (isPasswordValid) {
+                            // ✅ Changed: Return a valid user object for successful login
                             return {
                                 id: user.id,
                                 name: user.name,
@@ -38,10 +35,12 @@ export const NEXT_AUTH = {
                         throw new Error("No user found with this email address.");
                     }
                 } else {
-                    const existingUser = await checkExistingUser(credentials.email)
+                    // Handle signup flow
+                    const existingUser = await checkExistingUser(credentials.email);
                     if (existingUser) {
                         throw new Error("User with the same email address already exists.");
                     }
+
                     const hashedPassword = await bcrypt.hash(credentials.password, 10);
                     try {
                         const newUser = await prisma.user.create({
@@ -53,43 +52,40 @@ export const NEXT_AUTH = {
                             }
                         });
 
+                        // ✅ Changed: Return the new user object after signup
                         return {
                             id: newUser.id,
                             name: newUser.name,
                             email: newUser.email,
                         };
-
                     } catch (error) {
                         throw new Error("Failed to create user");
                     }
                 }
-
             },
         }),
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID || "",
             clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
         }),
-        // GitHubProvider({
-        //     clientId: process.env.GITHUB_ID || "",
-        //     clientSecret: process.env.GITHUB_SECRET || "",
-        // })        
     ],
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
         jwt: async ({ user, token }: any) => {
             if (user) {
+                // ✅ Changed: Adding user ID to token
                 token.uid = user.id;
             }
             return token;
         },
-        session: ({ session, token, user }: any) => {
+        session: ({ session, token }: any) => {
             if (session.user) {
-                session.user.id = token.uid
+                // ✅ Changed: Adding token user ID to session user
+                session.user.id = token.uid;
             }
-            return session
+            return session;
         },
-        signIn: async ({ user, account, profile } :any) => {
+        signIn: async ({ user, account }: any) => {
             if (account.provider === 'google') {
                 try {
                     const { email, id, name, image } = user;
@@ -97,37 +93,34 @@ export const NEXT_AUTH = {
                     if (!existingUser) {
                         const newUser = await prisma.user.create({
                             data: {
-                                email: email,
-                                name: name,
+                                email,
+                                name,
                                 googleId: id,
-                                image: image,
+                                image,
                                 method: 'google'
                             }
                         });
-                        // Return the new user object to establish the session.
-                        return {
-                            id: newUser.id,
-                            name: newUser.name,
-                            email: newUser.email,
-                        };
+                        // ✅ Changed: Return true for successful sign-in
+                        return true;
                     } else {
                         if (existingUser.method !== 'google') {
-                            throw new Error("User with the same email address already exists with a different sign-in method.");
+                            throw new Error("User with the same email exists with a different sign-in method.");
                         }
-                        return true; // User exists with the same method
+                        // ✅ Changed: Return true if user exists with the same method
+                        return true;
                     }
                 } catch (error) {
                     console.error("Error in signIn callback:", error);
-                    throw new Error("Failed to create user");
+                    throw new Error("Failed to sign in with Google.");
                 }
             }
+            // ✅ Changed: Return a boolean for credentials provider
             return account.provider === 'credentials';
         }
-        
     },
     pages: {
         signIn: "/signin",
         error: '/signin'
     },
     debug: true,
-}
+};

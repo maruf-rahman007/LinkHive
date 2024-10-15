@@ -6,6 +6,7 @@ import {
   profileNameAtom,
   profileHeadlineAtom,
   profileAccountsAtom,
+  usernameAtom,
 } from "@/store/atoms/atoms";
 import { useRecoilState } from "recoil";
 import axios from "axios";
@@ -17,6 +18,7 @@ export default function UserRoot({ children }: any) {
   const [profileName, setProfileName] = useRecoilState(profileNameAtom);
   const [profileHeadline, setProfileHeadline] = useRecoilState(profileHeadlineAtom);
   const [profileAccounts, setProfileAccounts] = useRecoilState(profileAccountsAtom);
+  const [userName,setUsername] = useRecoilState<string>(usernameAtom)
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -30,12 +32,11 @@ export default function UserRoot({ children }: any) {
         if (profile) {
           // Set individual profile states
           setProfileImage(profile.image || '/placeholder.svg');
-          setProfileName(profile.name || 'User Name');
+          setProfileName(profile.name || 'Your Name');
           setProfileHeadline(profile.headline || 'Aspiring Software Engineer');
+          setUsername(profile.username || 'User Name')
           setProfileAccounts(profile.accounts || []);
           setProfileData(profile); // Optional if you need the entire profile in one atom
-        } else {
-          setError("No profile found.");
         }
       } catch (err) {
         console.error("Error fetching data:", err);

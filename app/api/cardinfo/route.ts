@@ -21,7 +21,7 @@ export async function GET(req: Request) {
                 accounts: true, // Include related accounts
             },
         });
-
+        console.log("Here is profile from card info",profile);
         // Check if the profile was found
         if (profile) {
             return NextResponse.json({ profile });

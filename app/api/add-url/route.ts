@@ -16,14 +16,15 @@ export async function GET(req: Request) {
             where: { email: session.user.email },
             select: { id: true } // Only get the id
         });
-
-        const profile = await prisma.profile.findUniqueOrThrow({
+        console.log("Back end ",user);
+        const profile = await prisma.profile.findUnique({
             where: { userId: user.id },
             include: { accounts: true } // Include related accounts
         });
-
+        console.log("Back end ",profile);
         return NextResponse.json({ profile });
     } catch (error) {
+        console.log(error)
         // Return specific error messages
         return NextResponse.json({ error: error || "Error while fetching profile." }, { status: 500 });
     }

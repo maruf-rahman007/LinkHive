@@ -4,7 +4,7 @@ import axios from 'axios';
 import Image from 'next/image'; // Import Next.js Image component
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { profileHeadlineAtom, profileImageAtom, profileNameAtom, usernameAtom } from '@/store/atoms/atoms';
-
+import { UploadButton } from '@/app/utils/uploadthings';
 const ProfileCard = () => {
   const session = useSession();
   const [profileImage, setProfileImage] = useRecoilState(profileImageAtom);
@@ -44,9 +44,17 @@ const ProfileCard = () => {
           height={68}
           className="rounded-full mr-4"
         />
-        <button className="p-2 m-4 bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors duration-300">
-          Change
-        </button>
+        <UploadButton
+        endpoint="imageUploader"
+        onClientUploadComplete={(res) => {
+          // Do something with the response
+          console.log("Files: ", res);
+          setProfileImage(res[0].appUrl);
+        }}
+        onUploadError={(error: Error) => {
+          alert(`ERROR! ${error.message}`);
+        }}
+      />
       </div>
       <input
         type="text"

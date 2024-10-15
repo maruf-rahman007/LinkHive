@@ -4,7 +4,8 @@ const nextConfig = {
     domains: [
       'ui-avatars.com',
       'lh3.googleusercontent.com',
-      'avatars.githubusercontent.com'
+      'avatars.githubusercontent.com',
+      'utfs.io'
     ],
   },
 };

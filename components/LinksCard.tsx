@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
     Modal,
@@ -17,9 +17,8 @@ import axios from "axios";
 import { Plus, Edit2, Share2, Star, Lock, BarChart2, Trash2 } from 'lucide-react';
 import { useRecoilState } from 'recoil';
 import { profileAccountsAtom } from "@/store/atoms/atoms";
+import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/router';
-
-
 
 export const platforms = [
     { key: "instagram", label: "Instagram" },
@@ -34,26 +33,33 @@ export default function LinkCards() {
     const [url, setUrl] = useState('');
     const [platform, setPlatform] = useState('');
     const [profileAccounts, setProfileAccounts] = useRecoilState(profileAccountsAtom);
+    const { toast } = useToast();
 
     const handleAction = async () => {
         console.log('URL:', url);
         console.log('Selected Platform:', platform);
-        const response = await axios.post('/api/add-url', {
-            url,
-            platform
-        });
+        try {
+            const response = await axios.post('/api/add-url', {
+                url,
+                platform
+            });
 
-        // Update the profile accounts after adding a new account
-        if (response.status === 200) {
-            console.log("new url add respobnse", response);
-            const id = response.data.newUrlData.id;
-            console.log(id, platform, url);
-            setProfileAccounts([...profileAccounts, { id, platform, url }]);
+            if (response.status === 200) {
+                console.log("new url add response", response);
+                const id = response.data.newUrlData.id;
+                console.log(id, platform, url);
+                setProfileAccounts([...profileAccounts, { id, platform, url }]);
+                toast({ title: 'Success', description: 'Link added successfully!', variant: 'default' });
+            }
+        } catch (error:any) {
+            console.error("Error adding link:", error);
+            toast({ title: "Error", description: error.response.data.message, variant: 'destructive' });
         }
     };
+
     //@ts-ignore
     const handleDelete = async (profileAccount, id) => {
-        console.log("Hi there its delete button", profileAccounts[id])
+        console.log("Hi there it's delete button", profileAccounts[id]);
         const resp = await axios.post('/api/delete-account', {
             profileAccounts: profileAccount,
             index: id
@@ -62,6 +68,7 @@ export default function LinkCards() {
             console.log("Here is my response ", resp);
             const updatedAccounts = profileAccounts.filter((_, index) => index !== id);
             setProfileAccounts(updatedAccounts);
+            toast({ title: 'Success', description: 'Link deleted successfully!', variant: 'default' });
         }
     }
 

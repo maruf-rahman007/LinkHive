@@ -4,12 +4,12 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X } from 'lucide-react'; // Make sure to install lucide-react if not already done
+import { Menu, X } from 'lucide-react';
 
 export const Appbar = () => {
     const router = useRouter();
     const { data: session } = useSession();
-    const [isMenuOpen, setIsMenuOpen] = useState(false); // State for mobile menu
+    const [isMenuOpen, setIsMenuOpen] = useState(false); 
 
     const handleSignOut = async () => {
         await signOut({ redirect: false });
@@ -22,7 +22,6 @@ export const Appbar = () => {
                 <h1 className="text-2xl md:text-3xl font-bold">
                     <Link href="/">LinkHive</Link>
                 </h1>
-                {/* Desktop Navigation */}
                 <nav className="hidden md:flex space-x-6">
                     {!session?.user && (
                         <>
@@ -33,7 +32,6 @@ export const Appbar = () => {
                     )}
                 </nav>
 
-                {/* Desktop Get Started Button */}
                 {session?.user ? (
                     <div className="hidden md:flex items-center">
                         <button
@@ -57,13 +55,13 @@ export const Appbar = () => {
                     </button>
                 )}
 
-                {/* Mobile Menu Button */}
+                
                 <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                     {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
                 </button>
             </div>
 
-            {/* Mobile Menu */}
+            
             {isMenuOpen && (
                 <nav className="md:hidden bg-gray-800 text-white mt-2 p-4 rounded">
                     {!session?.user && (

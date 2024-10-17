@@ -12,7 +12,6 @@ import {
 import { useRecoilValue } from "recoil";
 
 const PreviewCard = () => {
-  // Use Recoil state values directly
   const profileImage = useRecoilValue(profileImageAtom);
   const profileName = useRecoilValue(profileNameAtom);
   const profileHeadline = useRecoilValue(profileHeadlineAtom);

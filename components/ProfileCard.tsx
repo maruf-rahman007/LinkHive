@@ -1,16 +1,20 @@
-"use client"
+"use client";
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
-import Image from 'next/image'; // Import Next.js Image component
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { profileHeadlineAtom, profileImageAtom, profileNameAtom, usernameAtom } from '@/store/atoms/atoms';
+import Image from 'next/image';
+import { useRecoilState } from 'recoil';
+import { profileHeadlineAtom, profileImageAtom, usernameAtom } from '@/store/atoms/atoms';
 import { UploadButton } from '@/app/utils/uploadthings';
+import { useToast } from '@/hooks/use-toast'; 
+import { useState } from 'react';
+
 const ProfileCard = () => {
   const session = useSession();
   const [profileImage, setProfileImage] = useRecoilState(profileImageAtom);
   const [profileHeadline, setProfileHeadline] = useRecoilState(profileHeadlineAtom);
   const [usernameatom, setUsernameAtome] = useRecoilState(usernameAtom);
-
+  const { toast } = useToast();
+  const [errormsg,setErrorMsg] = useState("");
   const handleSave = async () => {
     try {
       const response = await axios.post('/api/user', {
@@ -18,16 +22,20 @@ const ProfileCard = () => {
         title: profileHeadline,
         profilePicture: profileImage,
       });
+
       setProfileImage(response.data.updatedProfile.image);
       setProfileHeadline(response.data.updatedProfile.headline);
-      setUsernameAtome(response.data.updatedProfile.username)
+      setUsernameAtome(response.data.updatedProfile.username);
       console.log("response after post", response);
+
       if (response.status === 200) {
-        alert('Profile updated successfully!');
+        toast({ title: 'Success', description: 'Profile updated successfully!', variant: 'default' });
       }
-    } catch (error) {
+    } catch (error:any) {
+      setErrorMsg(error.response.data.message);
+      console.log(errormsg)
       console.error("Error updating profile:", error);
-      alert('Failed to update profile.');
+      toast({ title: "Error", description: error.response.data.message, variant: 'destructive' });
     }
   };
 
@@ -38,21 +46,20 @@ const ProfileCard = () => {
       </div>
       <div className="flex items-center mb-8 mt-8">
         <Image
-          src={profileImage || '/placeholder.png'} // Placeholder image
+          src={profileImage || '/placeholder.png'}
           alt="Profile"
-          width={68} // Size adjustments for Next.js Image
+          width={68}
           height={68}
           className="rounded-full mr-4"
         />
         <UploadButton
           endpoint="imageUploader"
           onClientUploadComplete={(res) => {
-            // Do something with the response
             console.log("Files: ", res);
             setProfileImage(res[0].appUrl);
           }}
           onUploadError={(error: Error) => {
-            alert(`ERROR! ${error.message}`);
+            toast({ title: 'Picture Upload Error Please Try agin ', description: `ERROR! ${error.message}`, variant: 'destructive' });
           }}
         />
       </div>

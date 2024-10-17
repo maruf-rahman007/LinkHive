@@ -39,3 +39,8 @@ export const usernameAtom = atom<string>({
   key: 'usernameAtom',
   default: "",
 });
+
+export const originalusernameAtom = atom<string>({
+  key: 'originalusernameAtom',
+  default: "",
+});

@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react';
 import axios from 'axios';
 import Image from 'next/image';
 import { useRecoilState } from 'recoil';
-import { profileHeadlineAtom, profileImageAtom, usernameAtom } from '@/store/atoms/atoms';
+import { originalusernameAtom, profileHeadlineAtom, profileImageAtom, usernameAtom } from '@/store/atoms/atoms';
 import { UploadButton } from '@/app/utils/uploadthings';
 import { useToast } from '@/hooks/use-toast'; 
 import { useState } from 'react';
@@ -13,13 +13,14 @@ const ProfileCard = () => {
   const [profileImage, setProfileImage] = useRecoilState(profileImageAtom);
   const [profileHeadline, setProfileHeadline] = useRecoilState(profileHeadlineAtom);
   const [usernameatom, setUsernameAtome] = useRecoilState(usernameAtom);
-  const [username, setusername] = useState("");
+  const [username, setusername] = useRecoilState(originalusernameAtom);
+  console.log("Oroginal username",username);
   const { toast } = useToast();
   const [errormsg,setErrorMsg] = useState("");
   const handleSave = async () => {
     try {
       const response = await axios.post('/api/user', {
-        username: username,
+        username: usernameatom,
         title: profileHeadline,
         profilePicture: profileImage,
       });
@@ -27,12 +28,14 @@ const ProfileCard = () => {
       setProfileImage(response.data.updatedProfile.image);
       setProfileHeadline(response.data.updatedProfile.headline);
       setUsernameAtome(response.data.updatedProfile.username);
+      setusername(response.data.updatedProfile.username);
       console.log("response after post", response);
 
       if (response.status === 200) {
         toast({ title: 'Success', description: 'Profile updated successfully!', variant: 'default' });
       }
     } catch (error:any) {
+      setUsernameAtome(username);
       setErrorMsg(error.response.data.message);
       console.log(errormsg)
       console.error("Error updating profile:", error);
@@ -67,7 +70,7 @@ const ProfileCard = () => {
       <input
         type="text"
         value={usernameatom}
-        onChange={(e) => setusername(e.target.value)}
+        onChange={(e) => setUsernameAtome(e.target.value)}
         placeholder={usernameatom}
         className="border p-2 rounded mb-4 w-full bg-white bg-opacity-80 focus:bg-white"
       />

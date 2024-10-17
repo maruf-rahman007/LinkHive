@@ -7,6 +7,7 @@ import {
   profileHeadlineAtom,
   profileAccountsAtom,
   usernameAtom,
+  originalusernameAtom,
 } from "@/store/atoms/atoms";
 import { useRecoilState } from "recoil";
 import axios from "axios";
@@ -18,14 +19,15 @@ export default function UserRoot({ children }: any) {
   const [profileName, setProfileName] = useRecoilState(profileNameAtom);
   const [profileHeadline, setProfileHeadline] = useRecoilState(profileHeadlineAtom);
   const [profileAccounts, setProfileAccounts] = useRecoilState(profileAccountsAtom);
-  const [userName, setUsername] = useRecoilState<string>(usernameAtom)
+  const [userName, setUsername] = useRecoilState<string>(usernameAtom);
+  const [originalusername,setoriginalusername] = useRecoilState(originalusernameAtom);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('/api/add-url'); // Ensure this matches your backend endpoint
+        const response = await axios.get('/api/add-url');
         const profile = response.data.profile;
         console.log("Here is the preview data :", profile);
 
@@ -37,6 +39,7 @@ export default function UserRoot({ children }: any) {
           setUsername(profile.username || 'User Name')
           setProfileAccounts(profile.accounts || []);
           setProfileData(profile); // Optional if you need the entire profile in one atom
+          setoriginalusername(profile.username || 'User Name');
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -47,7 +50,7 @@ export default function UserRoot({ children }: any) {
     };
 
     fetchData();
-  }, [setProfileData, setProfileImage, setProfileName, setProfileHeadline, setProfileAccounts]);
+  }, [setProfileData, setProfileImage, setProfileName, setProfileHeadline, setProfileAccounts,setoriginalusername]);
 
   if (loading) {
     return (

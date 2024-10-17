@@ -7,12 +7,13 @@ import { Link2, Palette, Share2, Settings } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { ShareDialog } from './ShareDialog'; 
 import { useRecoilValue } from 'recoil';
-import { usernameAtom } from '@/store/atoms/atoms';
+import { originalusernameAtom } from '@/store/atoms/atoms';
+
 
 export default function MenuBar() {
   const router = useRouter();
   const [activeRoute, setActiveRoute] = useState<string>();
-  const username = useRecoilValue(usernameAtom) 
+  const username = useRecoilValue(originalusernameAtom); 
 
   const menuItems = [
     { icon: Link2, label: 'Links', route: '/user/links' },

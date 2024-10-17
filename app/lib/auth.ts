@@ -16,13 +16,11 @@ export const NEXT_AUTH = {
             async authorize(credentials: any) {
                 console.log("Received credentials:", credentials);
 
-                // Handle login flow
                 if (credentials.isLogin === 'true') {
                     const user = await checkExistingUser(credentials.email);
                     if (user && isEmailMethod(user)) {
                         const isPasswordValid = await bcrypt.compare(credentials.password, user.password || "");
                         if (isPasswordValid) {
-                            // ✅ Changed: Return a valid user object for successful login
                             return {
                                 id: user.id,
                                 name: user.name,
@@ -35,7 +33,6 @@ export const NEXT_AUTH = {
                         throw new Error("No user found with this email address.");
                     }
                 } else {
-                    // Handle signup flow
                     const existingUser = await checkExistingUser(credentials.email);
                     if (existingUser) {
                         throw new Error("User with the same email address already exists.");
@@ -52,7 +49,6 @@ export const NEXT_AUTH = {
                             }
                         });
 
-                        // ✅ Changed: Return the new user object after signup
                         return {
                             id: newUser.id,
                             name: newUser.name,
@@ -73,14 +69,12 @@ export const NEXT_AUTH = {
     callbacks: {
         jwt: async ({ user, token }: any) => {
             if (user) {
-                // ✅ Changed: Adding user ID to token
                 token.uid = user.id;
             }
             return token;
         },
         session: ({ session, token }: any) => {
             if (session.user) {
-                // ✅ Changed: Adding token user ID to session user
                 session.user.id = token.uid;
             }
             return session;
@@ -100,13 +94,11 @@ export const NEXT_AUTH = {
                                 method: 'google'
                             }
                         });
-                        // ✅ Changed: Return true for successful sign-in
                         return true;
                     } else {
                         if (existingUser.method !== 'google') {
                             throw new Error("User with the same email exists with a different sign-in method.");
                         }
-                        // ✅ Changed: Return true if user exists with the same method
                         return true;
                     }
                 } catch (error) {
@@ -114,13 +106,30 @@ export const NEXT_AUTH = {
                     throw new Error("Failed to sign in with Google.");
                 }
             }
-            // ✅ Changed: Return a boolean for credentials provider
             return account.provider === 'credentials';
         }
     },
     pages: {
         signIn: "/signin",
         error: '/signin'
+    },
+    cookies: {
+        sessionToken: {
+            name: `next-auth.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                secure: true,
+            },
+        },
+        callbackToken: {
+            name: `next-auth.callback-token`,
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                secure: true,
+            },
+        },
     },
     debug: true,
 };

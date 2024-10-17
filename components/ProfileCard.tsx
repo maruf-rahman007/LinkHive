@@ -13,12 +13,13 @@ const ProfileCard = () => {
   const [profileImage, setProfileImage] = useRecoilState(profileImageAtom);
   const [profileHeadline, setProfileHeadline] = useRecoilState(profileHeadlineAtom);
   const [usernameatom, setUsernameAtome] = useRecoilState(usernameAtom);
+  const [username, setusername] = useState("");
   const { toast } = useToast();
   const [errormsg,setErrorMsg] = useState("");
   const handleSave = async () => {
     try {
       const response = await axios.post('/api/user', {
-        username: usernameatom,
+        username: username,
         title: profileHeadline,
         profilePicture: profileImage,
       });
@@ -66,7 +67,7 @@ const ProfileCard = () => {
       <input
         type="text"
         value={usernameatom}
-        onChange={(e) => setUsernameAtome(e.target.value)}
+        onChange={(e) => setusername(e.target.value)}
         placeholder={usernameatom}
         className="border p-2 rounded mb-4 w-full bg-white bg-opacity-80 focus:bg-white"
       />
